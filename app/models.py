@@ -1,5 +1,5 @@
 from datetime import datetime
-from sqlalchemy import Column, Integer, String, Text, DateTime, ForeignKey, Numeric
+from sqlalchemy import Column, Integer, String, Text, DateTime, ForeignKey, Numeric, JSON
 from sqlalchemy.orm import relationship
 from app.database import Base
 
@@ -35,7 +35,6 @@ class TUsuario(Base):
 
     rol = relationship("TRol", back_populates="usuarios")
     reservas = relationship("TReserva", back_populates="usuario")
-    auditorias = relationship("TAuditoria", back_populates="usuario")
 
 
 # --- HUÉSPEDES Y HABITACIONES ---
@@ -153,14 +152,19 @@ class TPago(Base):
 
 class TAuditoria(Base):
     __tablename__ = "tauditorias"
-
     id_auditoria = Column(Integer, primary_key=True, index=True)
-    id_usuario = Column(String(6), ForeignKey("tusuarios.id_usuario"), nullable=True)  # NULL = acción del sistema
-    accion = Column(String(30), nullable=False)  # INSERT / UPDATE / DELETE / LOGIN / LOGOUT
-    tabla_afectada = Column(String(30), nullable=False)
-    id_registro = Column(Integer, nullable=True)
-    fecha = Column(DateTime, default=lambda: datetime.now())
-    descripcion = Column(Text)
-    ip = Column(String(45))  # 45 caracteres para soportar IPv6
-
-    usuario = relationship("TUsuario", back_populates="auditorias")
+    id_usuario = Column(String(20))
+    tabla = Column(String(20))
+    accion = Column(String(30))
+    fecha_accion = Column(DateTime, default=lambda: datetime.now())
+    datos_previos = Column(JSON, nullable=True)
+    datos_nuevos = Column(JSON)
+    ip = Column(String(20))
+    # ubicacion = Column(String(50)) Futuro
+    user_agent = Column(Text)
+    
+class TokenRevocado(Base):
+    __tablename__ = "tokens_revocados"
+    id = Column(Integer, primary_key=True, index=True)
+    token = Column(String(255), unique=True, index=True)  # JWT ID
+    fecha_revocacion = Column(DateTime, default=lambda: datetime.now())
