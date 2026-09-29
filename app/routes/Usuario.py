@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, Request, status
 from datetime import datetime
 from sqlalchemy.orm import Session
-from app.security import hash_password
+from app.security import get_password_hash
 from passlib.context import CryptContext
 from app.database import get_db
 from app import models, schemas
@@ -11,8 +11,6 @@ router = APIRouter(
     tags=["Usuario"],
     responses={404: {"description": "Not found"}},
 )
-
-
 
 def generar_id_usuario(db: Session) -> str:
     """Genera el siguiente ID con patrón: USU001, USU002, USU003..."""
@@ -81,7 +79,7 @@ def crear_usuario(
     nuevo_id = generar_id_usuario(db)
 
     # 5. Hashear la contraseña (NUNCA texto plano)
-    password_hash = hash_password(usuario_data.password)
+    password_hash = get_password_hash(usuario_data.password)
 
     nuevo_usuario = models.TUsuario(
         id_usuario=nuevo_id,

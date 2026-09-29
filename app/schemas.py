@@ -295,3 +295,11 @@ class AuditoriaGet(BaseModel):
     ip: str | None = None
 
     model_config = {"from_attributes": True}
+    
+class SignupCreate(BaseModel):
+    nombre: str
+    apellido: str
+    usuario: str
+    password: str = Field(min_length=8, max_length=72)
+    email: EmailStr
+    
